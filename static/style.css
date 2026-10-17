@@ -351,3 +351,17 @@ footer{color:var(--muted);font-size:12px;line-height:1.7;margin-top:26px;text-al
 @keyframes ysl-save-pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,98,79,0);}
   40%{box-shadow:0 0 0 4px rgba(22,98,79,.20);}}
 .fbtns a.btn.ghost.hl{animation:ysl-save-pulse 1.4s ease-in-out 3;border-color:rgba(22,98,79,.65);}
+
+/* ============ 2026-10-17 P2：页内提示条 / 曲目筛选 / 正在播放高亮 ============ */
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-14px);z-index:90;max-width:min(92vw,720px);
+  padding:12px 18px;border-radius:12px;font-size:13.5px;line-height:1.5;
+  background:#fff;border:1px solid rgba(179,38,30,.35);color:#8a1c14;
+  box-shadow:0 10px 30px rgba(16,21,25,.18);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;}
+.toast.show{opacity:1;transform:translate(-50%,0);}
+.toast.ok{background:#f0f9f4;border-color:rgba(22,98,79,.35);color:#0f4a3c;}
+#tracks-filter{width:100%;margin:12px 0 4px;padding:11px 14px;font:inherit;font-size:14px;
+  background:#fbfcfb;border:1px solid rgba(16,21,25,.12);border-radius:11px;}
+#tracks-filter:focus{outline:none;border-color:#16624f;box-shadow:0 0 0 3px rgba(22,98,79,.12);}
+#files li.playing,#music-tracks li.playing{background:rgba(22,98,79,.07);
+  box-shadow:inset 3px 0 0 #16624f;border-radius:8px;}
+#music-tracks li.playing .fname::after{content:" ▶";color:#16624f;font-size:11px;}

@@ -12,6 +12,17 @@ let mode = 'video';
 let curJob = null, timer = null;
 
 /* ---------- 工具 ---------- */
+/* 页内提示条：替代原生 alert()（原生弹窗会阻塞、样式突兀、手机上还会被拦） */
+let TOAST_T = null;
+function toast(msg, kind) {
+  const el = $('toast');
+  if (!el) { alert(msg); return; }
+  el.textContent = String(msg == null ? '' : msg);
+  el.className = 'toast show' + (kind === 'ok' ? ' ok' : '');
+  clearTimeout(TOAST_T);
+  TOAST_T = setTimeout(() => { el.className = 'toast'; }, 7000);
+}
+
 function fmtBytes(n) {
   if (!n && n !== 0) return '—';
   const u = ['B', 'KB', 'MB', 'GB'];
@@ -46,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('ysl_admin', ADMIN_TOKEN);
     await loadStatus();
     if (!$('btn-login').hidden) $('quota-line').textContent = YSLLang.T('admin_ok');
-    else alert(YSLLang.T('admin_bad'));
+    else toast(YSLLang.T('admin_bad'));
   };
 });
 
@@ -293,7 +304,7 @@ $('btn-paste').onclick = async () => {
   try {
     const t = await navigator.clipboard.readText();
     if (t) $('url').value = t.trim();
-  } catch { $('url').focus(); alert(YSLLang.T('clip_fail')); }
+  } catch { $('url').focus(); toast(YSLLang.T('clip_fail')); }
 };
 
 $('btn-start').onclick = async () => {
@@ -321,7 +332,7 @@ $('btn-start').onclick = async () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url, ...readOpts() }),
   });
-  if (r.error) { alert(r.error); $('btn-start').disabled = false; return; }
+  if (r.error) { toast(r.error); $('btn-start').disabled = false; return; }
   loadStatus();                                   // 刷新额度显示
   watch(r.id);
 };
@@ -452,7 +463,7 @@ function pickQr(lines) {
 /* ---------- 登录 ---------- */
 bind('btn-login', async () => {              // B站 专属；小红书站没有这个节点
   const r = await api('api/login', { method: 'POST' });
-  if (r.error) { alert(r.error); return; }
+  if (r.error) { toast(r.error); return; }
   $('qr-panel').hidden = false;
   $('qr-pre').textContent = YSLLang.T('qr_gen');
   $('qr-state').textContent = YSLLang.T('qr_wait');
@@ -494,7 +505,7 @@ async function refreshNeAuth() {
 
 bind('btn-ne-login', async () => {
   const r = await api('api/login', { method: 'POST' });
-  if (r.error) { alert(r.error); return; }
+  if (r.error) { toast(r.error); return; }
   setHidden('ne-qr-panel', false);
   setText('ne-qr-state', YSLLang.T('qr_wait'));
   const img = $('ne-qr-img');
@@ -557,7 +568,7 @@ function renderTracks(d) {
         body: JSON.stringify(Object.assign(
           { url: 'https://music.163.com/song?id=' + t.id }, readOpts(), { preview: !!preview })),
       });
-      if (r.error) { alert(r.error); return; }
+      if (r.error) { toast(r.error); return; }
       if (preview) PENDING_PREVIEW = r.id;   // 取回后自动在底部播放条里播
       loadStatus();
       watch(r.id);
@@ -566,7 +577,11 @@ function renderTracks(d) {
     bp.className = 'btn ghost';
     bp.textContent = YSLLang.T('listen');
     bp.title = YSLLang.T('listen_tip');
-    bp.onclick = () => submit(true);
+    bp.onclick = () => {
+      ul.querySelectorAll('li').forEach((x) => x.classList.remove('playing'));
+      li.classList.add('playing');
+      submit(true);
+    };
     const b = document.createElement('button');
     b.className = 'btn ghost';
     b.textContent = YSLLang.T('get_one');
@@ -575,7 +590,18 @@ function renderTracks(d) {
     li.append(name, meta, btns);
     ul.appendChild(li);
   }
-  box.append(head, ul);
+  /* 100 首歌单得能筛：输入关键词即时过滤（前端过滤，零请求） */
+  const filt = document.createElement('input');
+  filt.id = 'tracks-filter';
+  filt.type = 'search';
+  filt.placeholder = YSLLang.T('filter_ph');
+  filt.addEventListener('input', () => {
+    const q = filt.value.trim().toLowerCase();
+    ul.querySelectorAll('li').forEach((li) => {
+      li.style.display = (!q || li.textContent.toLowerCase().includes(q)) ? '' : 'none';
+    });
+  });
+  box.append(head, filt, ul);
 }
 
 bind('btn-music-list', async () => {
@@ -607,6 +633,11 @@ function pbarShow(f) {
   const a = $('player-audio');
   if (!a) return;
   PBAR = f;
+  // 文件列表里把正在播的那一行标出来
+  document.querySelectorAll('#files li').forEach((li) => {
+    const n = li.querySelector('.fname');
+    li.classList.toggle('playing', !!(n && (n.textContent === (f.label || f.name))));
+  });
   setText('pbar-title', f.label || f.name);
   setText('pbar-sub', fmtBytes(f.size) + (f.ext ? ' · ' + String(f.ext).toUpperCase() : ''));
   setHidden('pbar', false);
@@ -617,6 +648,7 @@ function pbarShow(f) {
 }
 
 function pbarHide() {
+  document.querySelectorAll('#files li.playing').forEach((li) => li.classList.remove('playing'));
   const a = $('player-audio');
   if (a) { try { a.pause(); } catch (e) {} a.removeAttribute('src'); a.load(); }
   setHidden('pbar', true);
