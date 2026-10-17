@@ -84,7 +84,7 @@
         waiting_scan: "Waiting for scan",
         login_done: "Signed in ✓",
         login_fail: "Not completed",
-        quota: "Today: you {u}/{pl} · site {gu}/{gl} · one job at a time",
+        quota: "You can download {left} more today · {gleft} left site-wide",
         footer_use: "For lesson preparation only · files auto-clean after {rt}",
         footer_local: "Runs on your own machine",
       },
@@ -168,7 +168,7 @@
         waiting_scan: "等待扫码",
         login_done: "登录成功 ✓",
         login_fail: "登录未完成",
-        quota: "今日额度：你已用 {u}/{pl} 次 · 全站 {gu}/{gl} 次 · 单任务串行",
+        quota: "今天还能下载 {left} 次 · 全站还剩 {gleft} 次",
         footer_use: "本服务仅供教学备课使用 · 文件 {rt} 内自动清理",
         footer_local: "在你自己的电脑上运行",
       },
@@ -245,7 +245,7 @@
         done: "Done",
         failed: "Failed",
         canceled: "Canceled",
-        quota: "Today: you {u}/{pl} · site {gu}/{gl} · one job at a time",
+        quota: "You can download {left} more today · {gleft} left site-wide",
         footer_use: "For lesson preparation only · files auto-clean after {rt}",
       },
       zh: {
@@ -319,7 +319,7 @@
         done: "完成",
         failed: "失败",
         canceled: "已取消",
-        quota: "今日额度：你已用 {u}/{pl} 次 · 全站 {gu}/{gl} 次 · 单任务串行",
+        quota: "今天还能下载 {left} 次 · 全站还剩 {gleft} 次",
         footer_use: "本服务仅供教学备课使用 · 文件 {rt}内自动清理",
       },
     },
@@ -398,7 +398,7 @@
         waiting_scan: "Waiting for scan",
         login_done: "Signed in ✓",
         login_fail: "Not completed",
-        quota: "Today: you {u}/{pl} · site {gu}/{gl} · one job at a time",
+        quota: "You can download {left} more today · {gleft} left site-wide",
         footer_use: "For lesson preparation only · files auto-clean after {rt}",
       },
       zh: {
@@ -475,7 +475,7 @@
         waiting_scan: "等待扫码",
         login_done: "登录成功 ✓",
         login_fail: "登录未完成",
-        quota: "今日额度：你已用 {u}/{pl} 次 · 全站 {gu}/{gl} 次 · 单任务串行",
+        quota: "今天还能下载 {left} 次 · 全站还剩 {gleft} 次",
         footer_use: "本服务仅供教学备课使用 · 文件 {rt}内自动清理",
       },
     },
@@ -486,7 +486,10 @@
   const PACK = DICT[ENGINE] || DICT.bili;
   window.YSLLang = {
     get current() {
-      return localStorage.getItem(LANG_KEY) === "zh" ? "zh" : "en";
+      const saved = localStorage.getItem(LANG_KEY);
+      if (saved === "zh" || saved === "en") return saved;
+      // 没主动选过 → 跟随浏览器语言（中文浏览器直接进中文，其它默认英文）
+      return (navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en";
     },
     set(lang) {
       localStorage.setItem(LANG_KEY, lang === "zh" ? "zh" : "en");

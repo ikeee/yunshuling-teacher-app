@@ -143,8 +143,33 @@ def main():
         kind = link_kind(a.url)
         pid = (ids or re.findall(r"\d{6,}", a.url) or [""])[0]
         if not pid:
-            log("[错误] 没从链接里认出 id")
-            return 7
+            # 关键词（不是链接）：列出前 5 条让老师自己挑，不替他盲选
+            kw = a.url.strip()
+            if not kw:
+                log("[错误] 没认出链接，也没有关键词")
+                return 7
+            log("[搜索] 关键词：" + kw)
+            try:
+                r = apis.cloudsearch.GetSearchResult(kw, stype=1, limit=5)
+            except Exception as e:
+                log("[错误] 搜索失败: " + str(e)[:150])
+                return 3
+            songs = (r.get("result") or {}).get("songs") or []
+            if not songs:
+                log("[错误] 没有搜到结果")
+                return 3
+            items = [{
+                "id": s.get("id"),
+                "name": s.get("name") or "",
+                "artist": "、".join([ar.get("name") for ar in (s.get("ar") or []) if ar.get("name")]),
+                "dur": s.get("dt") or 0,
+                "fee": s.get("fee"),
+            } for s in songs[:5]]
+            log("[搜索] 找到 {0} 条，请挑一条".format(len(items)))
+            print("MUSIC_LIST " + json.dumps(
+                {"title": kw, "count": len(items), "kind": "search", "tracks": items},
+                ensure_ascii=False), flush=True)
+            return 0
         if kind == "album":
             try:
                 _r = apis.album.GetAlbumInfo(pid)
@@ -218,6 +243,19 @@ def main():
         if not songs:
             log("[错误] 没有搜到结果")
             return 3
+        if a.list:
+            # 搜索模式下不替老师做决定：把前 5 条列出来让他自己挑
+            items = [{
+                "id": s.get("id"),
+                "name": s.get("name") or "",
+                "artist": "、".join([ar.get("name") for ar in (s.get("ar") or []) if ar.get("name")]),
+                "dur": s.get("dt") or 0, "fee": s.get("fee"),
+            } for s in songs[:5]]
+            log("[搜索] 找到 {0} 条，请挑一条".format(len(items)))
+            print("MUSIC_LIST " + json.dumps(
+                {"title": kw, "count": len(items), "kind": "search", "tracks": items},
+                ensure_ascii=False), flush=True)
+            return 0
         for s in songs:
             log("   {0} - {1}  (id={2})".format(
                 ((s.get("ar") or [{}])[0].get("name") or "?"), (s.get("name") or "")[:30], s.get("id")))

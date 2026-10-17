@@ -32,43 +32,7 @@
   </div>
 
   <!-- ===== 登录（第 ① 步：先登录，才拿得到高清） ===== -->
-  <!--BILI-ONLY-->
-  <section class="card" id="login-card">
-    <div class="rowhead">
-      <h2><span class="step-badge" data-i18n="step0"></span><span data-i18n="login_h"></span><span class="dot" id="auth-dot"></span><span id="auth-text" class="muted"></span></h2>
-      <div class="headbtns">
-        <input id="admin-pass" type="password" data-i18n-ph="admin_ph" hidden>
-        <button class="btn ghost" id="btn-unlock" hidden data-i18n="unlock"></button>
-        <button class="btn danger" id="btn-forget" hidden data-i18n="forget_btn"></button>
-        <button class="btn ghost" id="btn-login" data-i18n="login_btn"></button>
-      </div>
-    </div>
-    <p class="sub" id="auth-desc"><span data-i18n="login_desc"></span></p>
-    <p class="sub" id="sess-line" hidden></p>
-    <div id="qr-panel" hidden>
-      <p class="sub" data-i18n="qr_hint"></p>
-      <pre id="qr-pre" class="qr"></pre>
-      <p class="sub" id="qr-state"></p>
-    </div>
-  </section>
-  <!--/BILI-ONLY-->
 
-  <!--MUSIC-ONLY-->
-  <section class="card" id="music-login-card">
-    <div class="rowhead">
-      <h2><span class="step-badge" data-i18n="step0"></span><span data-i18n="login_h"></span><span class="dot" id="ne-auth-dot"></span><span id="ne-auth-text" class="muted">未登录</span></h2>
-      <div class="headbtns">
-        <button class="btn ghost" id="btn-ne-login" data-i18n="login_btn"></button>
-        <button class="btn danger" id="btn-ne-forget" hidden data-i18n="forget_btn"></button>
-      </div>
-    </div>
-    <p class="sub" data-i18n="login_desc"></p>
-    <div id="ne-qr-panel" hidden>
-      <pre id="ne-qr-pre" class="qr"></pre>
-      <p class="sub" id="ne-qr-state"></p>
-    </div>
-  </section>
-  <!--/MUSIC-ONLY-->
 
   <!-- ===== 下载 ===== -->
   <section class="card">
@@ -193,6 +157,44 @@
     <p class="sub after-hint" data-i18n="after_hint"></p>
   </section>
 
+  <!--BILI-ONLY-->
+  <section class="card" id="login-card">
+    <div class="rowhead">
+      <h2><span class="step-badge" data-i18n="step0"></span><span data-i18n="login_h"></span><span class="dot" id="auth-dot"></span><span id="auth-text" class="muted"></span></h2>
+      <div class="headbtns">
+        <input id="admin-pass" type="password" data-i18n-ph="admin_ph" hidden>
+        <button class="btn ghost" id="btn-unlock" hidden data-i18n="unlock"></button>
+        <button class="btn danger" id="btn-forget" hidden data-i18n="forget_btn"></button>
+        <button class="btn ghost" id="btn-login" data-i18n="login_btn"></button>
+      </div>
+    </div>
+    <p class="sub" id="auth-desc"><span data-i18n="login_desc"></span></p>
+    <p class="sub" id="sess-line" hidden></p>
+    <div id="qr-panel" hidden>
+      <p class="sub" data-i18n="qr_hint"></p>
+      <pre id="qr-pre" class="qr"></pre>
+      <p class="sub" id="qr-state"></p>
+    </div>
+  </section>
+  <!--/BILI-ONLY-->
+
+  <!--MUSIC-ONLY-->
+  <section class="card" id="music-login-card">
+    <div class="rowhead">
+      <h2><span class="step-badge" data-i18n="step0"></span><span data-i18n="login_h"></span><span class="dot" id="ne-auth-dot"></span><span id="ne-auth-text" class="muted">未登录</span></h2>
+      <div class="headbtns">
+        <button class="btn ghost" id="btn-ne-login" data-i18n="login_btn"></button>
+        <button class="btn danger" id="btn-ne-forget" hidden data-i18n="forget_btn"></button>
+      </div>
+    </div>
+    <p class="sub" data-i18n="login_desc"></p>
+    <div id="ne-qr-panel" hidden>
+      <pre id="ne-qr-pre" class="qr"></pre>
+      <p class="sub" id="ne-qr-state"></p>
+    </div>
+  </section>
+  <!--/MUSIC-ONLY-->
+
   <!-- ===== 任务 ===== -->
   <section class="card" id="job-card" hidden>
     <div class="jobhead">
@@ -214,7 +216,7 @@
   </section>
 
   <!-- ===== 文件 ===== -->
-  <section class="card">
+  <section class="card" id="files-card">
     <div class="rowhead">
       <h2 data-i18n="files_h"></h2>
       <div>

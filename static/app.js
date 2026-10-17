@@ -98,8 +98,9 @@ async function loadStatus() {
 
     $('notice-body').textContent = YSLLang.T('notice', { rt: rt });
     const q = s.quota || {};
-    setText('quota-line', YSLLang.T('quota', { u: q.per_ip_used || 0, pl: q.per_ip_limit,
-      gu: q.global_used || 0, gl: q.global_limit }));
+    setText('quota-line', YSLLang.T('quota', {
+      left: Math.max(0, (q.per_ip_limit || 0) - (q.per_ip_used || 0)),
+      gleft: Math.max(0, (q.global_limit || 0) - (q.global_used || 0)) }));
     setHidden('dirrow', true);                  // 服务器模式下不显示"保存路径"框（路径由服务器决定，显示只会误导）
     setHidden('btn-save-dir', true);
     setHidden('btn-open', true);
@@ -298,6 +299,22 @@ $('btn-paste').onclick = async () => {
 $('btn-start').onclick = async () => {
   const url = $('url').value.trim();
   if (!url) { $('url').focus(); return; }
+  /* 音乐站：输入的不是链接（= 歌名）时，先列出前 5 条让老师挑；
+     不再替他盲选第一条（可能下到翻唱/错版本，还白扣一次额度）。 */
+  if (ENGINE === 'music' && !/^https?:\/\//i.test(url)) {
+    $('btn-start').disabled = true;
+    setHidden('music-tracks', false);
+    const box = $('music-tracks');
+    if (box) box.innerHTML = '<p class="sub">' + YSLLang.T('tracks_loading') + '</p>';
+    const r0 = await api('api/music/list?url=' + encodeURIComponent(url));
+    $('btn-start').disabled = false;
+    if (r0.error) {
+      if (box) box.innerHTML = '<p class="sub">' + YSLLang.T('tracks_fail') + r0.error + '</p>';
+      return;
+    }
+    renderTracks(r0);
+    return;
+  }
   $('btn-start').disabled = true;
   const r = await api('api/job', {
     method: 'POST',
@@ -349,7 +366,16 @@ async function poll(id) {
     $('btn-start').disabled = false;
     $('btn-cancel').hidden = true;
     loadFiles();
-    if (j.state === 'done') loadStatus();
+    if (j.state === 'done') {
+      loadStatus();
+      // 完成后把老师带到文件列表，并把「另存为」闪一下（1 小时后文件会被删）
+      setTimeout(() => {
+        const card = $('files-card');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const a = document.querySelector('#files li a.btn');
+        if (a) { a.classList.add('hl'); setTimeout(() => a.classList.remove('hl'), 5000); }
+      }, 600);
+    }
     /* 歌单行点「试听」：这个任务一完成就自动播最新那个音频文件 */
     if (j.state === 'done' && PENDING_PREVIEW === id) {
       PENDING_PREVIEW = null;
