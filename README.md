@@ -35,3 +35,7 @@ pip install yutto yt-dlp
 * 只监听 `127.0.0.1`，外网访问不到。
 * 未登录时 B站 只给 480P；登录后 1080P；1080P60 / 4K / 8K 需要大会员。
 * 请遵守平台规则与著作权法，下载内容仅供个人学习研究使用。
+
+## 部署
+
+本仓库只含下载器应用本体；teacher.yunshuling.com 的 nginx / 门户 / 登录服务统一放在 [yunshuling-teacher-portal](https://github.com/ikeee/yunshuling-teacher-portal) 的 deploy/nginx/ 与 services/。
