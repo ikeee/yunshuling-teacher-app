@@ -1,5 +1,5 @@
 {
-  "download_dir": "D:\\YIN-PROJE\\downloads\\bilibili",
+  "download_dir": "downloads/bilibili",
   "defaults": {
     "mode": "video",
     "quality": "best",
